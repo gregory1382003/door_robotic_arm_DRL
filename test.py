@@ -7,7 +7,7 @@ from torch.utils.tensorboard import SummaryWriter
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
 # from networks import *
-# from td3_torch import *
+from td3_torch import *
 # from buffer import *
 
 if __name__ == '__main__':
