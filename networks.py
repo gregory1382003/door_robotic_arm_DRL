@@ -8,7 +8,7 @@ import numpy as np
 
 class CriticNetwork(nn.Module):
 
-    def __init__(self, input_dims, n_actions, fc1_dims=256, fc2_dims=128, name="critic", checkpoint_dir='tmp/265_proj', learning_rate=10e-3):
+    def __init__(self, input_dims, n_actions, fc1_dims=256, fc2_dims=128, name="critic", checkpoint_dir='tmp/td3_proj', learning_rate=10e-3):
         super(CriticNetwork, self).__init__()
 
         self.input_dims = input_dims
@@ -17,7 +17,7 @@ class CriticNetwork(nn.Module):
         self.n_actions = n_actions
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name+'265_proj')
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, name+'td3_proj')
 
         self.fc1 = nn.Linear(self.input_dims[0]+n_actions, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
@@ -25,9 +25,9 @@ class CriticNetwork(nn.Module):
 
         self.optimizer = optim.AdamW(self.parameters(), lr=learning_rate, weight_decay=0.005)
 
-        self.device = 'cpu'
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
 
-        print("Created Critic Network on cpu")
+        print("Created Critic Network on device: ", self.device)
 
         self.to(self.device)
 
@@ -52,7 +52,7 @@ class CriticNetwork(nn.Module):
 
 class ActorNetwork(nn.Module):
 
-    def __init__(self, input_dims, n_actions=2, fc1_dims=256, fc2_dims=128, name="actor", checkpoint_dir='tmp/265_proj',
+    def __init__(self, input_dims, n_actions=2, fc1_dims=256, fc2_dims=128, name="actor", checkpoint_dir='tmp/td3_proj',
                      learning_rate=10e-3):
         super(ActorNetwork, self).__init__()
 
@@ -62,14 +62,17 @@ class ActorNetwork(nn.Module):
         self.n_actions = n_actions
         self.name = name
         self.checkpoint_dir = checkpoint_dir
-        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + '265_proj')
+        self.checkpoint_file = os.path.join(self.checkpoint_dir, name + 'td3_proj')
 
         self.fc1 = nn.Linear(*self.input_dims, self.fc1_dims)
         self.fc2 = nn.Linear(self.fc1_dims, self.fc2_dims)
         self.output = nn.Linear(self.fc2_dims, self.n_actions)
 
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
-        self.device = T.device('cpu')
+
+        self.device = T.device('cuda:0' if T.cuda.is_available() else 'cpu')
+
+        print("Created Actor Network on device: ", self.device)
 
         self.to(self.device)
 

@@ -1,26 +1,33 @@
+import time
 import os
+import gym
+import numpy as np
+# import torch as torch # dont need in this file
+from torch.utils.tensorboard import SummaryWriter
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
+# from networks import *
+# from td3_torch import *
+# from buffer import *
 
-from td3_torch import Agent
+if __name__ == '__main__':
 
-
-if __name__ == "__main__":
-    if not os.path.exists("tmp/265_proj"):
-        os.makedirs("tmp/265_proj")
+    if not os.path.exists("tmp/td3_proj"):
+        os.makedirs("tmp/td3_proj")
 
     env_name = "Door"
 
     env = suite.make(
         env_name,
-        robots=["Panda"],
-        controller_configs=suite.load_controller_config(default_controller="JOINT_VELOCITY"),
+        robots = ["Panda"],
+        controller_configs = suite.load_controller_config(default_controller="JOINT_VELOCITY"),
         has_renderer=True,
         render_camera="frontview",
+        has_offscreen_renderer=True,
         use_camera_obs=False,
         horizon=300,
         reward_shaping=True,
-        control_freq=20,
+        control_freq=20
     )
 
     env = GymWrapper(env)

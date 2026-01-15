@@ -2,18 +2,19 @@ import time
 import os
 import gym
 import numpy as np
-import torch as torch
+# import torch as torch # dont need in this file
 from torch.utils.tensorboard import SummaryWriter
 import robosuite as suite
 from robosuite.wrappers import GymWrapper
-from networks import *
-from td3_torch import *
-from buffer import *
+
+from networks import ActorNetwork, CriticNetwork
+from buffer import ReplayBuffer
+from td3_torch import Agent
 
 if __name__ == '__main__':
 
-    if not os.path.exists("tmp/265_proj"):
-        os.makedirs("tmp/265_proj")
+    if not os.path.exists("tmp/td3_proj"):
+        os.makedirs("tmp/td3_proj")
 
     env_name = "Door"
 
@@ -23,19 +24,27 @@ if __name__ == '__main__':
         controller_configs = suite.load_controller_config(default_controller="JOINT_VELOCITY"),
         has_renderer=False,
         use_camera_obs=False,
+        has_offscreen_renderer=False,
         horizon=300,
         reward_shaping=True,
         control_freq=20
     )
 
     env = GymWrapper(env)
+    
+    # check networks and buffer
+
+    # critic_network = CriticNetwork(input_dims=[8], n_actions=8) # разобрать почему именно такие dim
+    # actor_network = ActorNetwork(input_dims=[8], n_actions=8)
+
+    # replay_buffer = ReplayBuffer(max_size=8, input_size=[8], n_actions=8)
 
     actor_learning_rate = 0.001
     critic_learning_rate = 0.001
     batch_size = 128
     layer1_size = 256
     layer2_size = 128
-
+    
     agent = Agent(actor_learning_rate=actor_learning_rate, critic_learning_rate=critic_learning_rate, tau=0.005,
                   input_dims=env.observation_space.shape, env=env, n_actions= env.action_space.shape[0],
                   layer1_size= layer2_size, layer2_size=layer2_size, batch_size=batch_size)
@@ -45,6 +54,7 @@ if __name__ == '__main__':
     best_score = 0
     episode_identifier = f"0 - actor_learning_rate={actor_learning_rate} critic_learning_rate={critic_learning_rate} " \
                          f"layer_1_size={layer1_size} layer_2_size={layer2_size}"
+    
     agent.load_module()
 
     for i in range(n_games):
@@ -67,6 +77,3 @@ if __name__ == '__main__':
             agent.save_models()
 
         print(f"Episode:{i} Score: {score}")
-
-
-

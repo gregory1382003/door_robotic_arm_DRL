@@ -14,13 +14,18 @@ pip install -r requirements.txt
 ```
 
 ## Training
-Run training:
+Navigate to your project directory and Run training:
 ```bash
 python main.py
 ```
+View training metrics in TensorBoard (logs are written to `./logs/`):
+```bash
+tensorboard --logdir logs --port 6006
+```
+Then open `http://localhost:6006` in your browser.
 
 ## Demo
-Run the demo:
+Run the demo (opens an on-screen render window):
 ```bash
 python test.py
 ```
